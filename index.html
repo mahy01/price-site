@@ -1,9 +1,47 @@
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قیمت لحظه‌ای</title>
+    <meta name="description" content="قیمت لحظه‌ای طلا، سکه، دلار، یورو و پوند - به‌روزترین نرخ ارز و طلا از منبع معتبر BrsApi">
+    <meta name="keywords" content="قیمت لحظه‌ای طلا, قیمت دلار, قیمت سکه, نرخ ارز, قیمت یورو, قیمت پوند, قیمت طلا امروز, قیمت سکه امامی, قیمت سکه بهار آزادی">
+    <meta name="author" content="مهسا دادفر - LearnDotfar">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph برای تلگرام و شبکه‌های اجتماعی -->
+    <meta property="og:title" content="💰 قیمت لحظه‌ای طلا، سکه و ارز">
+    <meta property="og:description" content="قیمت لحظه‌ای طلا، سکه، دلار، یورو و پوند - همیشه به‌روز">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mahy01.github.io/price-site/">
+    <meta property="og:locale" content="fa_IR">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="قیمت لحظه‌ای طلا و ارز">
+    <meta name="twitter:description" content="قیمت لحظه‌ای طلا، سکه، دلار، یورو و پوند">
+
+    <title>قیمت لحظه‌ای طلا، سکه، دلار، یورو و پوند | نرخ ارز امروز</title>
+
+    <!-- Structured Data (برای گوگل) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "قیمت لحظه‌ای طلا و ارز",
+        "description": "نمایش لحظه‌ای قیمت طلا، سکه، دلار، یورو و پوند",
+        "url": "https://mahy01.github.io/price-site/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any",
+        "inLanguage": "fa-IR",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "IRR"
+        }
+    }
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -14,10 +52,20 @@
             padding: 20px;
         }
         .container { max-width: 500px; margin: 0 auto; }
-        h1 { text-align: center; margin-bottom: 10px; font-size: 28px; }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 5px; 
+            font-size: 26px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            opacity: 0.7;
+            margin-bottom: 15px;
+        }
         .date {
             text-align: center;
-            opacity: 0.8;
+            opacity: 0.85;
             margin-bottom: 20px;
             font-size: 14px;
             padding: 10px;
@@ -36,7 +84,7 @@
             align-items: center;
         }
         .left { display: flex; flex-direction: column; }
-        .label { font-size: 13px; opacity: 0.75; }
+        .label { font-size: 13px; opacity: 0.8; }
         .value { font-size: 20px; font-weight: bold; margin-top: 4px; }
         .change {
             font-size: 13px;
@@ -63,11 +111,16 @@
         }
         .footer {
             text-align: center;
-            margin-top: 20px;
-            opacity: 0.5;
+            margin-top: 25px;
+            opacity: 0.6;
             font-size: 12px;
+            line-height: 1.8;
         }
-        .loading { text-align: center; opacity: 0.6; padding: 20px; }
+        .footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        .loading { text-align: center; opacity: 0.7; padding: 20px; }
         .error { 
             text-align: center; 
             background: rgba(244,67,54,0.2); 
@@ -76,29 +129,66 @@
             border-radius: 10px; 
             margin: 10px 0;
         }
+
+        /* مخفی کردن محتوای SEO در پایین صفحه */
+        .seo-content {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 2;
+            opacity: 0.85;
+        }
+        .seo-content h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        .seo-content h3 {
+            font-size: 14px;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>💰 قیمت لحظه‌ای</h1>
+        <h1>💰 قیمت لحظه‌ای طلا و ارز</h1>
+        <div class="subtitle">طلا، سکه، دلار، یورو و پوند - همیشه به‌روز</div>
+        
         <div class="date" id="date">در حال بارگذاری...</div>
         
         <div id="content">
             <div class="loading">⏳ در حال دریافت قیمت‌های واقعی...</div>
         </div>
         
-        <button class="update-btn" onclick="loadPrices()">🔄 بروزرسانی</button>
-        
+        <button class="update-btn" onclick="loadPrices()">🔄 بروزرسانی قیمت‌ها</button>
+
+        <!-- محتوای SEO (گوگل این رو می‌خونه) -->
+        <div class="seo-content">
+            <h2>📊 درباره این سایت</h2>
+            <p>این سایت قیمت لحظه‌ای طلا، سکه، دلار، یورو و پوند را به‌صورت زنده از منبع معتبر نمایش می‌دهد. قیمت‌ها هر ۵ دقیقه به‌صورت خودکار به‌روزرسانی می‌شوند.</p>
+            
+            <h3>🥇 طلا و سکه</h3>
+            <p>قیمت طلای ۱۸ عیار، سکه امامی و سکه بهار آزادی به‌صورت لحظه‌ای نمایش داده می‌شود. قیمت طلا و سکه مهم‌ترین شاخص بازار ایران است.</p>
+            
+            <h3>💵 نرخ ارز</h3>
+            <p>قیمت دلار آمریکا، یورو و پوند انگلیس به تومان ایران. نرخ ارز از بازار آزاد ایران استخراج می‌شود.</p>
+            
+            <h3>🔄 به‌روزرسانی خودکار</h3>
+            <p>قیمت‌ها هر ۵ دقیقه به‌صورت خودکار از API دریافت می‌شوند. همچنین می‌توانید با دکمه بروزرسانی، قیمت‌ها را به‌صورت دستی به‌روز کنید.</p>
+        </div>
+
         <div class="footer">
-            ساخته شده توسط مهسا
+            ساخته شده با 🌙 توسط <a href="https://t.me/LearnDotfar">@LearnDotfar</a><br>
+            داده‌ها از <a href="https://brsapi.ir" target="_blank">BrsApi.ir</a>
         </div>
     </div>
 
     <script>
-        // کلید API تو
         const API_KEY = 'BC5accFYDlIs3VGNvfWkcI7APSNiRdXw';
         
-        // فقط اینارو نشون بده
         const wantedSymbols = {
             'IR_GOLD_18K': '🥇 طلای ۱۸ عیار',
             'IR_COIN_EMAMI': '🪙 سکه امامی',
@@ -108,12 +198,10 @@
             'GBP': '💷 پوند'
         };
         
-        // تبدیل اعداد به فارسی
         function toPersian(num) {
             return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
         }
         
-        // تاریخ و ساعت
         function updateDate() {
             const now = new Date();
             document.getElementById('date').innerText = 
@@ -122,7 +210,6 @@
         updateDate();
         setInterval(updateDate, 1000);
         
-        // گرفتن قیمت‌ها از API واقعی
         async function loadPrices() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="loading">⏳ در حال دریافت قیمت‌های واقعی...</div>';
@@ -165,9 +252,7 @@
             }
         }
         
-        // اولین بار
         loadPrices();
-        // هر ۵ دقیقه خودکار آپدیت
         setInterval(loadPrices, 5 * 60 * 1000);
     </script>
 </body>
