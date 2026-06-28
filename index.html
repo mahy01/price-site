@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قیمت لحظه‌ای</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 10px; font-size: 28px; }
+        .date {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            font-size: 14px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .card {
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .left { display: flex; flex-direction: column; }
+        .label { font-size: 13px; opacity: 0.75; }
+        .value { font-size: 20px; font-weight: bold; margin-top: 4px; }
+        .change {
+            font-size: 13px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .up { background: rgba(76,175,80,0.25); color: #81c784; }
+        .down { background: rgba(244,67,54,0.25); color: #e57373; }
+        .neutral { background: rgba(255,255,255,0.1); color: #aaa; }
+        .update-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+        .loading { text-align: center; opacity: 0.6; padding: 20px; }
+        .error { 
+            text-align: center; 
+            background: rgba(244,67,54,0.2); 
+            color: #e57373;
+            padding: 15px; 
+            border-radius: 10px; 
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 قیمت لحظه‌ای</h1>
+        <div class="date" id="date">در حال بارگذاری...</div>
+        
+        <div id="content">
+            <div class="loading">⏳ در حال دریافت قیمت‌های واقعی...</div>
+        </div>
+        
+        <button class="update-btn" onclick="loadPrices()">🔄 بروزرسانی</button>
+        
+        <div class="footer">
+            ساخته شده توسط مهسا
+        </div>
+    </div>
+
+    <script>
+        // کلید API تو
+        const API_KEY = 'BC5accFYDlIs3VGNvfWkcI7APSNiRdXw';
+        
+        // فقط اینارو نشون بده
+        const wantedSymbols = {
+            'IR_GOLD_18K': '🥇 طلای ۱۸ عیار',
+            'IR_COIN_EMAMI': '🪙 سکه امامی',
+            'IR_COIN_BAHAR': '🪙 سکه بهار آزادی',
+            'USD': '💵 دلار آمریکا',
+            'EUR': '💶 یورو',
+            'GBP': '💷 پوند'
+        };
+        
+        // تبدیل اعداد به فارسی
+        function toPersian(num) {
+            return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        }
+        
+        // تاریخ و ساعت
+        function updateDate() {
+            const now = new Date();
+            document.getElementById('date').innerText = 
+                now.toLocaleDateString('fa-IR') + ' | ' + now.toLocaleTimeString('fa-IR');
+        }
+        updateDate();
+        setInterval(updateDate, 1000);
+        
+        // گرفتن قیمت‌ها از API واقعی
+        async function loadPrices() {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">⏳ در حال دریافت قیمت‌های واقعی...</div>';
+            
+            try {
+                const url = 'https://Api.BrsApi.ir/Market/Gold_Currency.php?key=' + API_KEY;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.status === 'error' || data.successful === false) {
+                    content.innerHTML = '<div class="error">❌ ' + (data.message_error || 'کلید API نامعتبر است') + '</div>';
+                    return;
+                }
+                
+                let html = '';
+                const allItems = [...(data.gold || []), ...(data.currency || [])];
+                
+                allItems.forEach(item => {
+                    if (wantedSymbols[item.symbol]) {
+                        const arrow = item.change_percent > 0 ? '↑' : item.change_percent < 0 ? '↓' : '→';
+                        const cls = item.change_percent > 0 ? 'up' : item.change_percent < 0 ? 'down' : 'neutral';
+                        const priceText = toPersian(Math.round(item.price).toLocaleString('en-US')) + ' تومان';
+                        
+                        html += `
+                            <div class="card">
+                                <div class="left">
+                                    <div class="label">${wantedSymbols[item.symbol]}</div>
+                                    <div class="value">${priceText}</div>
+                                </div>
+                                <div class="change ${cls}">${arrow} ${toPersian(Math.abs(item.change_percent).toFixed(2))}٪</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                content.innerHTML = html || '<div class="error">داده‌ای یافت نشد</div>';
+                
+            } catch (err) {
+                content.innerHTML = '<div class="error">❌ خطا در دریافت قیمت‌ها<br><small>' + err.message + '</small></div>';
+            }
+        }
+        
+        // اولین بار
+        loadPrices();
+        // هر ۵ دقیقه خودکار آپدیت
+        setInterval(loadPrices, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
